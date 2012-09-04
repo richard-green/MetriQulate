@@ -11,7 +11,8 @@
     <RootNamespace>MetriQulate.Test</RootNamespace>
     <AssemblyName>MetriQulate.Test</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -34,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\ThirdPartyLibraries\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\ThirdPartyLibraries\Castle.Windsor.dll</HintPath>
+    </Reference>
     <Reference Include="EasyNetQ, Version=0.6.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\ThirdPartyLibraries\EasyNetQ.dll</HintPath>
     </Reference>
@@ -52,6 +59,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IMyClass.cs" />
+    <Compile Include="MyClass.cs" />
     <Compile Include="TestProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -60,6 +69,9 @@
       <Project>{66F49262-2A84-4DAA-B5A4-CFCD26B92EAC}</Project>
       <Name>MetriQulate.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\ThirdPartyLibraries\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\ThirdPartyLibraries\Castle.Windsor.dll</HintPath>
+    </Reference>
     <Reference Include="EasyNetQ">
       <HintPath>..\ThirdPartyLibraries\EasyNetQ.dll</HintPath>
     </Reference>
@@ -49,6 +55,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Installer.cs" />
+    <Compile Include="MetriQInterceptor.cs" />
     <Compile Include="Profiler.cs" />
     <Compile Include="ProfilerExtensions.cs" />
     <Compile Include="TimingResult.cs" />
