@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using MetriQulate.Core;
 
 namespace MetriQulate.Test
 {
@@ -22,7 +23,10 @@ namespace MetriQulate.Test
 
 		private void Step1a()
 		{
-			Thread.Sleep(5);
+			using (Profiler.Instance.Timer("Step1a"))
+			{
+				Thread.Sleep(5);
+			}
 		}
 
 		private void Step2()

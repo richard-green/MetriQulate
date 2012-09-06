@@ -10,6 +10,7 @@ using Castle.Windsor;
 using Castle.MicroKernel.Registration;
 using Castle.Core;
 using Castle.Windsor.Installer;
+using System.Threading.Tasks;
 
 namespace MetriQulate.Test
 {
@@ -43,15 +44,18 @@ namespace MetriQulate.Test
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 10; i++)
 			{
-				var myClass = container.Resolve<IMyClass>();
+				Task asyncTask = new Task(() =>
+				{
+					var myClass = container.Resolve<IMyClass>();
+					myClass.BeginProcess();
+				});
 
-				// Make the call
-				myClass.BeginProcess();
+				asyncTask.Start();
 			}
 
-			Console.WriteLine("Complete in {0:n0}ms", stopwatch.ElapsedMilliseconds);
+			Console.WriteLine("InterceptorMetricTest Complete in {0:n0}ms", stopwatch.ElapsedMilliseconds);
 		}
 
 		private static void ExplicitMetricTest()
@@ -77,7 +81,7 @@ namespace MetriQulate.Test
 				}
 			}
 
-			Console.WriteLine("Complete in {0:n0}ms", stopwatch.ElapsedMilliseconds);
+			Console.WriteLine("ExplicitMetricTest Complete in {0:n0}ms", stopwatch.ElapsedMilliseconds);
 		}
 
 		private static void TimingReceived(TimingResult timing)
@@ -92,7 +96,7 @@ namespace MetriQulate.Test
 		{
 			if (timing.SubTimings != null && timing.SubTimings.Count > 0)
 			{
-				Console.WriteLine("{0} {1} - {2:n0}ms ({3:n0}ms)", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed);
+				Console.WriteLine("{0} [{4}] {1} - {2:n0}ms ({3:n0}ms)", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed, timing.ThreadId);
 				foreach (var subTiming in timing.SubTimings)
 				{
 					DumpTiming(subTiming, nestLevel + 1);
@@ -100,7 +104,7 @@ namespace MetriQulate.Test
 			}
 			else
 			{
-				Console.WriteLine("{0} {1} - {2:n0}ms", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed);
+				Console.WriteLine("{0} [{4}] {1} - {2:n0}ms", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed, timing.ThreadId);
 			}
 		}
 	}

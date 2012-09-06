@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using EasyNetQ;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace MetriQulate.Core
 {
@@ -46,40 +48,28 @@ namespace MetriQulate.Core
 
 		#region Instance Members
 
-		private Stopwatch stopwatch;
-		private Timing currentTimer;
+		private ConcurrentDictionary<int, Timing> threadTimings = new ConcurrentDictionary<int, Timing>();
 
 		internal Timing Timer(string name)
 		{
-			if (currentTimer == null)
-			{
-				stopwatch = Stopwatch.StartNew();
-			}
-
-			currentTimer = new Timing(name, this, currentTimer, stopwatch.ElapsedMilliseconds);
+			var threadId = Thread.CurrentThread.ManagedThreadId;
+			var currentTimer = threadTimings.ContainsKey(threadId) ? threadTimings[threadId] : null;
+			currentTimer = new Timing(name, this, currentTimer, threadId);
+			threadTimings[threadId] = currentTimer;
 			return currentTimer;
 		}
 
 		internal void StopTimer(Timing timing)
 		{
-			currentTimer = timing.Parent;
+			var threadId = Thread.CurrentThread.ManagedThreadId;
+			threadTimings[threadId] = timing.Parent;
 
-			if (currentTimer == null)
+			if (timing.Parent == null)
 			{
-				stopwatch.Stop();
-
 				using (var channel = _bus.OpenPublishChannel())
 				{
 					channel.Publish(timing.GetResults());
 				}
-			}
-		}
-
-		internal long Elapsed
-		{
-			get
-			{
-				return (stopwatch == null) ? 0 : stopwatch.ElapsedMilliseconds;
 			}
 		}
 

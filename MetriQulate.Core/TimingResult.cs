@@ -23,6 +23,11 @@ namespace MetriQulate.Core
 		public List<TimingResult> SubTimings { get; set; }
 
 		/// <summary>
+		/// ID of the Thread that the timer ran on
+		/// </summary>
+		public long ThreadId { get; set; }
+
+		/// <summary>
 		/// Total of all children's elapsed time, in milliseconds
 		/// </summary>
 		public long ChildrenElapsed

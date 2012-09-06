@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Newtonsoft.Json;	
 
 namespace MetriQulate.Core
 {
@@ -10,33 +9,42 @@ namespace MetriQulate.Core
 	{
 		#region Members
 
+		private Stopwatch stopwatch;
 		private string name;
 		private Profiler profiler;
 		private Timing parent;
 		private long startMilliseconds;
 		private long elapsed;
 		private List<Timing> subTimings;
+		private int threadId;
 		private bool disposed;
 
 		#endregion Members
 
 		#region Constructor
 
-		public Timing(string name, Profiler profiler, Timing parent, long startMilliseconds)
+		public Timing(string name, Profiler profiler, Timing parent, int threadId)
 		{
 			this.name = name;
 			this.profiler = profiler;
 			this.parent = parent;
-			this.startMilliseconds = startMilliseconds;
+			this.threadId = threadId;
 			this.disposed = false;
 
-			if (parent != null)
+			if (parent == null)
+			{
+				stopwatch = Stopwatch.StartNew();
+				startMilliseconds = 0;
+			}
+			else
 			{
 				if (parent.subTimings == null)
 				{
 					parent.subTimings = new List<Timing>();
 				}
 				parent.subTimings.Add(this);
+				stopwatch = parent.stopwatch;
+				startMilliseconds = stopwatch.ElapsedMilliseconds;
 			}
 		}
 
@@ -65,7 +73,7 @@ namespace MetriQulate.Core
 				}
 				else
 				{
-					return profiler.Elapsed - startMilliseconds;
+					return stopwatch.ElapsedMilliseconds - startMilliseconds;
 				}
 			}
 		}
@@ -80,7 +88,8 @@ namespace MetriQulate.Core
 			TimingResult results = new TimingResult()
 			{
 				Name = name,
-				Elapsed = Elapsed
+				Elapsed = Elapsed,
+				ThreadId = threadId
 			};
 
 			if (subTimings != null && subTimings.Count > 0)
@@ -101,7 +110,7 @@ namespace MetriQulate.Core
 			{
 				disposed = true;
 
-				elapsed = profiler.Elapsed - startMilliseconds;
+				elapsed = stopwatch.ElapsedMilliseconds - startMilliseconds;
 				profiler.StopTimer(this);
 			}
 		}
