@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Installer.cs" />
+    <Compile Include="MetriQInterceptFacility.cs" />
     <Compile Include="MetriQInterceptor.cs" />
     <Compile Include="Profiler.cs" />
     <Compile Include="ProfilerExtensions.cs" />

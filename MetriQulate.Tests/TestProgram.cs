@@ -11,12 +11,14 @@ using Castle.MicroKernel.Registration;
 using Castle.Core;
 using Castle.Windsor.Installer;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace MetriQulate.Test
 {
 	class TestProgram
 	{
 		static WindsorContainer container;
+		static object mutex = new object();
 
 		static void Main(string[] args)
 		{
@@ -35,12 +37,13 @@ namespace MetriQulate.Test
 		{
 			container = new Castle.Windsor.WindsorContainer();
 
+			container.AddFacility<MetriQInterceptFacility>(f => f.ForComponentsInNamespace("MetriQulate.Test"));
+
 			container.Install(FromAssembly.InDirectory(new AssemblyFilter("")));
 
 			container.Register(Component.For<IMyClass>()
 				.ImplementedBy<MyClass>()
-				.Interceptors(InterceptorReference.ForType<MetriQInterceptor>()).Anywhere
-				);
+			);
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -86,25 +89,38 @@ namespace MetriQulate.Test
 
 		private static void TimingReceived(TimingResult timing)
 		{
-			Console.WriteLine("Received:");
-			Console.ForegroundColor = ConsoleColor.Green;
-			DumpTiming(timing);
-			Console.ForegroundColor = ConsoleColor.Gray;
+			lock (mutex)
+			{
+				Console.WriteLine("Received:");
+				Console.ForegroundColor = ConsoleColor.Green;
+
+				using (var output = File.CreateText(String.Format(@"D:\Temp\MetriQs\{0} {1}.xml", timing.Name, Guid.NewGuid())))
+				{
+					DumpTiming(timing, output);
+				}
+
+				Console.ForegroundColor = ConsoleColor.Gray;
+			}
 		}
 
-		private static void DumpTiming(TimingResult timing, int nestLevel = 0)
+		private static void DumpTiming(TimingResult timing, StreamWriter output, int nestLevel = 0)
 		{
 			if (timing.SubTimings != null && timing.SubTimings.Count > 0)
 			{
-				Console.WriteLine("{0} [{4}] {1} - {2:n0}ms ({3:n0}ms)", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed, timing.ThreadId);
+				string message = String.Format("{0} {1} - {2:n0}ms ({3:n0}ms)", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed);
+				Console.WriteLine(message);
+				output.WriteLine("<{0} elapsed='{1}ms' children='{2}ms'>", timing.Name.Replace(".", "_"), timing.Elapsed, timing.ChildrenElapsed);
 				foreach (var subTiming in timing.SubTimings)
 				{
-					DumpTiming(subTiming, nestLevel + 1);
+					DumpTiming(subTiming, output, nestLevel + 1);
 				}
+				output.WriteLine("</{0}>", timing.Name.Replace(".", "_"));
 			}
 			else
 			{
-				Console.WriteLine("{0} [{4}] {1} - {2:n0}ms", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed, timing.ThreadId);
+				string message = String.Format("{0} {1} - {2:n0}ms", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed);
+				Console.WriteLine(message);
+				output.WriteLine("<{0} elapsed='{1}ms' />", timing.Name.Replace(".", "_"), timing.Elapsed, timing.ChildrenElapsed);
 			}
 		}
 	}
