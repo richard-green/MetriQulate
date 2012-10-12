@@ -51,8 +51,21 @@ namespace MetriQulate.Test
 			{
 				Task asyncTask = new Task(() =>
 				{
-					var myClass = container.Resolve<IMyClass>();
-					myClass.BeginProcess();
+					IMyClass myClass = null;
+
+					try
+					{
+						myClass = container.Resolve<IMyClass>();
+						myClass.BeginProcess();
+					}
+					catch (Exception ex)
+					{
+						Console.Out.WriteLine(ex.ToString());
+					}
+					finally
+					{
+						container.Release(myClass);
+					}
 				});
 
 				asyncTask.Start();
@@ -92,7 +105,11 @@ namespace MetriQulate.Test
 			lock (mutex)
 			{
 				Console.WriteLine("Received:");
-				Console.ForegroundColor = ConsoleColor.Green;
+
+				if (Directory.Exists(@"D:\Temp\MetriQs") == false)
+				{
+					Directory.CreateDirectory(@"D:\Temp\MetriQs");
+				}
 
 				using (var output = File.CreateText(String.Format(@"D:\Temp\MetriQs\{0} {1}.xml", timing.Name, Guid.NewGuid())))
 				{
@@ -105,6 +122,8 @@ namespace MetriQulate.Test
 
 		private static void DumpTiming(TimingResult timing, StreamWriter output, int nestLevel = 0)
 		{
+			Console.ForegroundColor = timing.ExceptionOccurred ? ConsoleColor.Red : ConsoleColor.Green;
+
 			if (timing.SubTimings != null && timing.SubTimings.Count > 0)
 			{
 				string message = String.Format("{0} {1} - {2:n0}ms ({3:n0}ms)", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed);

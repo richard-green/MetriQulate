@@ -13,9 +13,26 @@ namespace MetriQulate.Core
 
 		public void Intercept(IInvocation invocation)
 		{
-			using (Profiler.Instance.Timer(String.Format("{0}.{1}", invocation.TargetType.Name, invocation.Method.Name)))
+			var timer = Profiler.Instance.Timer(String.Format("{0}.{1}", invocation.TargetType.Name, invocation.Method.Name));
+
+			try
 			{
 				invocation.Proceed();
+			}
+			catch (Exception ex)
+			{
+				if (timer != null)
+				{
+					timer.ExceptionOccurred = true;
+				}
+				throw;
+			}
+			finally
+			{
+				if (timer != null)
+				{
+					timer.Dispose();
+				}
 			}
 		}
 

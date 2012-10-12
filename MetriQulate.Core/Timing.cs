@@ -78,6 +78,15 @@ namespace MetriQulate.Core
 			}
 		}
 
+		/// <summary>
+		/// If an unhandled exception occurred
+		/// </summary>
+		public bool ExceptionOccurred
+		{
+			get;
+			set;
+		}
+
 		internal Timing Parent
 		{
 			get { return parent; }
@@ -89,7 +98,8 @@ namespace MetriQulate.Core
 			{
 				Name = name,
 				Elapsed = Elapsed,
-				ThreadId = threadId
+				ThreadId = threadId,
+				ExceptionOccurred = ExceptionOccurred
 			};
 
 			if (subTimings != null && subTimings.Count > 0)

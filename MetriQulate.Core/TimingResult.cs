@@ -37,5 +37,10 @@ namespace MetriQulate.Core
 				return (SubTimings == null || SubTimings.Count == 0) ? 0 : SubTimings.Aggregate(0L, (total, subItem) => total + subItem.Elapsed);
 			}
 		}
+
+		/// <summary>
+		/// If an unhandled exception occurred
+		/// </summary>
+		public bool ExceptionOccurred { get; set; }
 	}
 }
