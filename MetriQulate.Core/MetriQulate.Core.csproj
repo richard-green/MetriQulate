@@ -55,12 +55,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CounterNotification.cs" />
+    <Compile Include="CounterExtensions.cs" />
+    <Compile Include="Counter.cs" />
+    <Compile Include="CounterReport.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="MetriQInterceptFacility.cs" />
     <Compile Include="MetriQInterceptor.cs" />
     <Compile Include="Profiler.cs" />
     <Compile Include="ProfilerExtensions.cs" />
-    <Compile Include="TimingResult.cs" />
+    <Compile Include="TimingNotification.cs" />
     <Compile Include="Timing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

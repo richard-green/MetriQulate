@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MetriQulate.Core
 {
-	public class TimingResult
+	public class TimingNotification
 	{
 		/// <summary>
 		/// Type of the calling class
@@ -30,7 +30,7 @@ namespace MetriQulate.Core
 		/// <summary>
 		/// List of sub-timings
 		/// </summary>
-		public List<TimingResult> SubTimings { get; set; }
+		public List<TimingNotification> SubTimings { get; set; }
 
 		/// <summary>
 		/// ID of the Thread that the timer ran on

@@ -46,6 +46,14 @@ namespace MetriQulate.Core
 
 		#endregion Static Members
 
+		#region Private Constructor
+
+		private Profiler()
+		{
+		}
+
+		#endregion Private Constructor
+
 		#region Instance Members
 
 		private ConcurrentDictionary<int, Timing> threadTimings = new ConcurrentDictionary<int, Timing>();
@@ -53,16 +61,16 @@ namespace MetriQulate.Core
 		internal Timing Timer(string typeName, string methodName, string timerName = null)
 		{
 			var threadId = Thread.CurrentThread.ManagedThreadId;
-			var currentTimer = threadTimings.ContainsKey(threadId) ? threadTimings[threadId] : null;
-			currentTimer = new Timing(typeName, methodName, timerName, this, currentTimer, threadId);
-			threadTimings[threadId] = currentTimer;
-			return currentTimer;
+			Timing currentTiming = null;
+			threadTimings.TryGetValue(threadId, out currentTiming);
+			currentTiming = new Timing(typeName, methodName, timerName, this, currentTiming, threadId);
+			threadTimings[threadId] = currentTiming;
+			return currentTiming;
 		}
 
 		internal void StopTimer(Timing timing)
 		{
 			var threadId = Thread.CurrentThread.ManagedThreadId;
-			threadTimings[threadId] = timing.Parent;
 
 			if (timing.Parent == null)
 			{
@@ -70,6 +78,12 @@ namespace MetriQulate.Core
 				{
 					channel.Publish(timing.GetResults());
 				}
+
+				threadTimings.TryRemove(threadId, out timing);
+			}
+			else
+			{
+				threadTimings[threadId] = timing.Parent;
 			}
 		}
 

@@ -112,9 +112,9 @@ namespace MetriQulate.Core
 			get { return parent; }
 		}
 
-		internal TimingResult GetResults()
+		internal TimingNotification GetResults()
 		{
-			TimingResult results = new TimingResult()
+			TimingNotification results = new TimingNotification()
 			{
 				TypeName = typeName,
 				MethodName = methodName,
