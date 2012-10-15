@@ -7,11 +7,11 @@ namespace MetriQulate.Core
 {
 	public static class ProfilerExtensions
 	{
-		public static Timing Timer(this Profiler profiler, string name)
+		public static Timing Timer(this Profiler profiler, string typeName, string methodName, string timerName = null)
 		{
 			if (profiler != null)
 			{
-				return profiler.Timer(name);
+				return profiler.Timer(typeName, methodName, timerName);
 			}
 
 			return null;

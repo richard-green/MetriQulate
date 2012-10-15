@@ -10,7 +10,9 @@ namespace MetriQulate.Core
 		#region Members
 
 		private Stopwatch stopwatch;
-		private string name;
+		private string typeName;
+		private string methodName;
+		private string timerName;
 		private Profiler profiler;
 		private Timing parent;
 		private long startMilliseconds;
@@ -23,9 +25,11 @@ namespace MetriQulate.Core
 
 		#region Constructor
 
-		public Timing(string name, Profiler profiler, Timing parent, int threadId)
+		internal Timing(string typeName, string methodName, string timerName, Profiler profiler, Timing parent, int threadId)
 		{
-			this.name = name;
+			this.typeName = typeName;
+			this.methodName = methodName;
+			this.timerName = timerName;
 			this.profiler = profiler;
 			this.parent = parent;
 			this.threadId = threadId;
@@ -53,11 +57,27 @@ namespace MetriQulate.Core
 		#region Instance Members
 
 		/// <summary>
-		/// Name of timing
+		/// Type of the calling class
 		/// </summary>
-		public string Name
+		public string TypeName
 		{
-			get { return name; }
+			get { return typeName; }
+		}
+
+		/// <summary>
+		/// Method of the calling class
+		/// </summary>
+		public string MethodName
+		{
+			get { return methodName; }
+		}
+
+		/// <summary>
+		/// Name of the timer
+		/// </summary>
+		public string TimerName
+		{
+			get { return timerName; }
 		}
 
 		/// <summary>
@@ -96,7 +116,9 @@ namespace MetriQulate.Core
 		{
 			TimingResult results = new TimingResult()
 			{
-				Name = name,
+				TypeName = typeName,
+				MethodName = methodName,
+				TimerName = timerName,
 				Elapsed = Elapsed,
 				ThreadId = threadId,
 				ExceptionOccurred = ExceptionOccurred

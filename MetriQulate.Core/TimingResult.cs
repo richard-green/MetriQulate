@@ -8,9 +8,19 @@ namespace MetriQulate.Core
 	public class TimingResult
 	{
 		/// <summary>
-		/// Name of timing
+		/// Type of the calling class
 		/// </summary>
-		public string Name { get; set; }
+		public string TypeName { get; set; }
+
+		/// <summary>
+		/// Method of the calling class
+		/// </summary>
+		public string MethodName { get; set; }
+
+		/// <summary>
+		/// Name of the timer
+		/// </summary>
+		public string TimerName { get; set; }
 
 		/// <summary>
 		/// Elapsed time in milliseconds

@@ -13,7 +13,7 @@ namespace MetriQulate.Core
 
 		public void Intercept(IInvocation invocation)
 		{
-			var timer = Profiler.Instance.Timer(String.Format("{0}.{1}", invocation.TargetType.Name, invocation.Method.Name));
+			var timer = Profiler.Instance.Timer(invocation.TargetType.Name, invocation.Method.Name);
 
 			try
 			{

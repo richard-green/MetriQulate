@@ -50,11 +50,11 @@ namespace MetriQulate.Core
 
 		private ConcurrentDictionary<int, Timing> threadTimings = new ConcurrentDictionary<int, Timing>();
 
-		internal Timing Timer(string name)
+		internal Timing Timer(string typeName, string methodName, string timerName = null)
 		{
 			var threadId = Thread.CurrentThread.ManagedThreadId;
 			var currentTimer = threadTimings.ContainsKey(threadId) ? threadTimings[threadId] : null;
-			currentTimer = new Timing(name, this, currentTimer, threadId);
+			currentTimer = new Timing(typeName, methodName, timerName, this, currentTimer, threadId);
 			threadTimings[threadId] = currentTimer;
 			return currentTimer;
 		}

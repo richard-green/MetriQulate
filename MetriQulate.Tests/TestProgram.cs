@@ -47,7 +47,7 @@ namespace MetriQulate.Test
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 100; i++)
 			{
 				Task asyncTask = new Task(() =>
 				{
@@ -80,15 +80,15 @@ namespace MetriQulate.Test
 
 			for (int i = 0; i < 5; i++)
 			{
-				using (Profiler.Instance.Timer("Timer 1"))
+				using (Profiler.Instance.Timer("TestProgram", "ExplicitMetricTest", "Timer 1"))
 				{
 					for (int j = 0; j < 5; j++)
 					{
-						using (Profiler.Instance.Timer("Timer 2"))
+						using (Profiler.Instance.Timer("TestProgram", "ExplicitMetricTest", "Timer 2"))
 						{
 							Thread.Sleep(5);
 
-							using (Profiler.Instance.Timer("Timer 3"))
+							using (Profiler.Instance.Timer("TestProgram", "ExplicitMetricTest", "Timer 3"))
 							{
 								Thread.Sleep(5);
 							}
@@ -111,7 +111,7 @@ namespace MetriQulate.Test
 					Directory.CreateDirectory(@"D:\Temp\MetriQs");
 				}
 
-				using (var output = File.CreateText(String.Format(@"D:\Temp\MetriQs\{0} {1}.xml", timing.Name, Guid.NewGuid())))
+				using (var output = File.CreateText(String.Format(@"D:\Temp\MetriQs\{0} {1} {2}.xml", timing.TypeName, timing.MethodName, Guid.NewGuid())))
 				{
 					DumpTiming(timing, output);
 				}
@@ -123,23 +123,21 @@ namespace MetriQulate.Test
 		private static void DumpTiming(TimingResult timing, StreamWriter output, int nestLevel = 0)
 		{
 			Console.ForegroundColor = timing.ExceptionOccurred ? ConsoleColor.Red : ConsoleColor.Green;
+			string message = String.Format("{0} {1}.{2} - {3:n0}ms ({4:n0}ms)", new String('>', nestLevel * 2), timing.TypeName, timing.MethodName, timing.Elapsed, timing.ChildrenElapsed);
+			Console.WriteLine(message);
 
 			if (timing.SubTimings != null && timing.SubTimings.Count > 0)
 			{
-				string message = String.Format("{0} {1} - {2:n0}ms ({3:n0}ms)", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed);
-				Console.WriteLine(message);
-				output.WriteLine("<{0} elapsed='{1}ms' children='{2}ms'>", timing.Name.Replace(".", "_"), timing.Elapsed, timing.ChildrenElapsed);
+				output.WriteLine("<timing typeName='{0}' methodName='{1}' elapsed='{2}ms' children='{3}ms'>", timing.TypeName, timing.MethodName, timing.Elapsed, timing.ChildrenElapsed);
 				foreach (var subTiming in timing.SubTimings)
 				{
 					DumpTiming(subTiming, output, nestLevel + 1);
 				}
-				output.WriteLine("</{0}>", timing.Name.Replace(".", "_"));
+				output.WriteLine("</timing>");
 			}
 			else
 			{
-				string message = String.Format("{0} {1} - {2:n0}ms", new String('>', nestLevel * 2), timing.Name, timing.Elapsed, timing.ChildrenElapsed);
-				Console.WriteLine(message);
-				output.WriteLine("<{0} elapsed='{1}ms' />", timing.Name.Replace(".", "_"), timing.Elapsed, timing.ChildrenElapsed);
+				output.WriteLine("<timing typeName='{0}' methodName='{1}' elapsed='{2}ms' children='{3}ms' />", timing.TypeName, timing.MethodName, timing.Elapsed, timing.ChildrenElapsed);
 			}
 		}
 	}

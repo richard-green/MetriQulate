@@ -23,7 +23,7 @@ namespace MetriQulate.Test
 
 		private void Step1a()
 		{
-			using (Profiler.Instance.Timer("Step1a"))
+			using (Profiler.Instance.Timer("MyClass", "Step1a"))
 			{
 				Thread.Sleep(5);
 			}
@@ -31,10 +31,10 @@ namespace MetriQulate.Test
 
 		private void Step2()
 		{
-			using (Profiler.Instance.Timer("Step2"))
+			using (Profiler.Instance.Timer("MyClass", "Step2"))
 			{
 				Thread.Sleep(5);
-				throw new NotImplementedException();
+				//throw new NotImplementedException();
 			}
 		}
 	}
