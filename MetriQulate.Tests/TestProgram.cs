@@ -27,20 +27,12 @@ namespace MetriQulate.Test
 			bus.Subscribe<CounterNotification>("Counter", CounterReceived);
 
 			// Comment out this line of code to disable profiling - profiling is disabled by default
-			//Profiler.EnableProfiling(bus);
+			Profiler.EnableProfiling(bus);
+			Counter.EnableReporting(bus, 500);
 
-			//InterceptorMetricTest();
+			InterceptorMetricTest();
 
 			//ExplicitMetricTest();
-
-			Counter.EnableReporting("host=localhost");
-
-			do
-			{
-				Thread.Sleep(11);
-				CounterTest();
-			}
-			while (true);
 		}
 
 		private static void CounterTest()
@@ -119,27 +111,45 @@ namespace MetriQulate.Test
 			Console.WriteLine("ExplicitMetricTest Complete in {0:n0}ms", stopwatch.ElapsedMilliseconds);
 		}
 
+		static Dictionary<string, CounterReport> reportTotals = new Dictionary<string, CounterReport>();
+
 		private static void CounterReceived(CounterNotification counterNotification)
 		{
 			lock (mutex)
 			{
-				Console.WriteLine("Received:");
-
-				foreach (var counter in counterNotification.Counters)
+				lock (reportTotals)
 				{
-					if (counter.SuccessCount > 0)
-					{
-						Console.ForegroundColor = ConsoleColor.Green;
-						Console.WriteLine("{0} - {1}", counter.SuccessCount, counter.Name);
-					}
-					if (counter.FailureCount > 0)
-					{
-						Console.ForegroundColor = ConsoleColor.Red;
-						Console.WriteLine("{0} - {1}", counter.FailureCount, counter.Name);
-					}
-				}
+					Console.WriteLine("Received:");
 
-				Console.ForegroundColor = ConsoleColor.Gray;
+					foreach (var counter in counterNotification.Counters)
+					{
+						CounterReport total = null;
+						if (reportTotals.TryGetValue(counter.Name, out total) == false)
+						{
+							total = new CounterReport()
+							{
+								Name = counter.Name,
+								SuccessCount = 0,
+								FailureCount = 0
+							};
+							reportTotals[counter.Name] = total;
+						}
+						if (counter.SuccessCount > 0)
+						{
+							total.SuccessCount += counter.SuccessCount;
+							Console.ForegroundColor = ConsoleColor.Green;
+							Console.WriteLine("{0} - {1} [{2}]", counter.SuccessCount, counter.Name, total.SuccessCount);
+						}
+						if (counter.FailureCount > 0)
+						{
+							total.FailureCount += counter.FailureCount;
+							Console.ForegroundColor = ConsoleColor.Red;
+							Console.WriteLine("{0} - {1} [{2}]", counter.FailureCount, counter.Name, total.FailureCount);
+						}
+					}
+
+					Console.ForegroundColor = ConsoleColor.Gray;
+				}
 			}
 		}
 

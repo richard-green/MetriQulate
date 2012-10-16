@@ -34,7 +34,6 @@ namespace MetriQulate.Test
 			using (Profiler.Instance.Timer("MyClass", "Step2"))
 			{
 				Thread.Sleep(5);
-				//throw new NotImplementedException();
 			}
 		}
 	}

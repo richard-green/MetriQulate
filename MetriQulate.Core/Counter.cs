@@ -153,10 +153,6 @@ namespace MetriQulate.Core
 							channel.Publish(notification);
 						}
 					}
-					else
-					{
-						Console.WriteLine("Nothing happened");
-					}
 				}
 			}
 			finally
